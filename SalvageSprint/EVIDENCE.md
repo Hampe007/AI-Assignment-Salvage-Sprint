@@ -2,18 +2,26 @@
 
 Keep this short. Bullet points, a small table and one diagram or code trace are enough. This is your checkpoint record, not an extra report. Replace the prompts as you work.
 
-Name:
-Exact Unity version:
-Checkpoint commit / repository:
-Current stage and anything unfinished:
+Name: Hampus Carlström Svanberg
+Exact Unity version: 6000.3.26f1
+Checkpoint commit / repository: 
+Current stage and anything unfinished: stage 0
 
 ## Initial prediction
 
 Three observations the rival needs, including one it might not have:
 
+- The location of nearby scrap that it can collect (so it has something to choose from)
+- Whether it is already carrying scrap (or if it can pick up more).
+- Whether there is a valid route to the scrap (or back to a dropoff if it needs to drop the scrap off).
+
 Seeing a pickup across a gap proves / does not prove reachability because:
 
+- Seeing a pickup does not prove rachability because there might not be a valid path to it. The rival might be able to see the pickup but be unable to reach it because of obstacles, gaps or other enviromental factors that are in the way.
+
 One question about NPC behaviour:
+
+- Why do NPCs in Bethesda games seem to have no sense of self-preservation when being attacked? (Skyrim, Fallout 4 etc)
 
 ## One complete trace
 
