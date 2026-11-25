@@ -7,7 +7,7 @@ Name: Hampus Carlström Svanberg
 
 Exact Unity version: 6000.3.26f1
 
-Checkpoint commit / repository: ??? (REMINDER: ASK CJ AGAIN WHAT TO WRITE HERE WHEN HE ARRIVES)
+Checkpoint commit / repository: main
 
 Current stage and anything unfinished: stage 0
 
@@ -56,3 +56,5 @@ My counterexample or experiment: prediction, observed result, and one limitation
 People I discussed or playtested with:
 Code, sources or substantive tools/AI assistance I used, and how I verified them:
 If unfinished: what works, exact reproduction steps, and the help I need:
+
+- Did the "Check together" part of stage 1 with ...
