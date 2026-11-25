@@ -2,9 +2,13 @@
 
 Keep this short. Bullet points, a small table and one diagram or code trace are enough. This is your checkpoint record, not an extra report. Replace the prompts as you work.
 
+
 Name: Hampus Carlström Svanberg
+
 Exact Unity version: 6000.3.26f1
-Checkpoint commit / repository: 
+
+Checkpoint commit / repository: ??? (REMINDER: ASK CJ AGAIN WHAT TO WRITE HERE WHEN HE ARRIVES)
+
 Current stage and anything unfinished: stage 0
 
 ## Initial prediction
