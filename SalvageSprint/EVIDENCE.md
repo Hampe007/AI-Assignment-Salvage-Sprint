@@ -9,7 +9,7 @@ Exact Unity version: 6000.3.26f1
 
 Checkpoint commit / repository: main
 
-Current stage and anything unfinished: stage 0
+Current stage and anything unfinished: Stage 2 done, Stage 3 is next. 
 
 ## Initial prediction
 
@@ -42,25 +42,45 @@ Use one actual situation. Include the observation data, derived facts, selected 
 - Gameplay feedback:
   - When `MatchController` confirms collection, the rival gains cargo. On the next decision, `Infer` should derive `NeedsDelivery = true`, and `Choose` should select Deliver with Target: -1. The rival should then navigate to the depot. Which it does.
 
+### Stage 2 follow-up: F4 hidden pickup
+
+- Changed rule: In `DecisionPolicy.Infer`, a candidate must be available and either visible or remembered before its distance is compared. Hidden unknown pickups are rejected.
+- Observed result: In hidden pickup scenario (F4), the rival ignored a hidden pickup, then selected it once it became visible and was closer. This matches the new rule because becoming visible made the pickup eligible for distance comparison.
+
 ## Scenario record
 
 | Scenario | Predicted result | Observed result and short evidence / remaining issue |
 |---|---|---|
 | Normal loop and restart | | |
 | Carrying cargo | | |
-| Hidden / remembered pickup | | |
+| Hidden / remembered pickup | Hidden unknown pickups should be ignored until visible. | In Scenario "hidden pickup" (F4), the rival ignored a hidden pickup, then selected it once it became visible and was closer. Remembered pickups outside sight were covered by the supplied Stage 2 test. |
 | Target taken | | |
 | Unreachable target | | |
 | No usable pickup | | |
 
-Supplied test result, with any added tests identified:
+Supplied test result, with any added tests identified: After the Stage 2 edit, 13 passed and 4 failed, matching the expected Stage 2 total.
 Live walkthrough checked by / recording link if used:
 
 ## One correction and one independent check
 
+(Will probably switch what I wrote to something else when I have something better to show)
+
 The original weakness and why it happened:
+
+- The original condition checked only availability and distance, so a nearer hidden unknown pickup could win even though the rival did not know about it.
+
 What I changed and why it addresses the cause:
+
+- In `DecisionPolicy.Infer`, I added `(candidate.Visible || candidate.Remembered)` to the availability and distance checks. A pickup must now be available and either visible or remembered before distance ranks it. This rejects hidden unknown pickups while allowing remembered pickups outside sight.
+
 My counterexample or experiment: prediction, observed result, and one limitation:
+
+## Stage 2 - small extra notes
+
+- A hidden remembered pickup can qualify because the rival previously selected it while it was visible and still remembers that target. Losing sight does not immediately erase that knowledge.
+- A hidden unknown pickup cannot qualify because the rival has not seen or remembered it. Being nearby does not mean the rival knows it exists.
+- The pickup must still be available, even if remembered. Distance only decides between candidates that pass the availability and knowledge checks.
+- Memory holds one selected target, not every pickup ever seen. Stage 2 allows switching to a closer eligible pickup keeping a useful current target comes in Stage 3.
 
 ## Collaboration and help
 
@@ -68,4 +88,4 @@ People I discussed or playtested with:
 Code, sources or substantive tools/AI assistance I used, and how I verified them:
 If unfinished: what works, exact reproduction steps, and the help I need:
 
-- Did the "Check together" part of stage 1 with ...
+- Did the "Check together" part (the group task) of stage 1 with Sebastian and Abbie

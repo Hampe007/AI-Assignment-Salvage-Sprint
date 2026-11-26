@@ -8,6 +8,14 @@ namespace SalvageSprint.Core
     {
         public const string Label = "Part 1 starter: nearest candidate";
 
+
+        private static bool IsEligable(Candidate candidate)
+        {
+            // Avaiable means the pickup has not been taken.
+            // Known means currently visible or retained in memory.
+            return candidate.Available && (candidate.Visible || candidate.Remembered);
+        }
+        
         // Infer the agent's facts from its observation. This is a simple, naive implementation that ignores visibility and memory.
         public static AgentFacts Infer(Observation observation)
         {
@@ -18,9 +26,12 @@ namespace SalvageSprint.Core
             float distance = float.PositiveInfinity;
             foreach (Candidate candidate in observation.Candidates)
             {
-                // Deliberately naive: ignores Visible, Remembered and Blocked.
-                if (candidate.Available && candidate.DistanceSquared < distance)
-                { nearest = candidate.Id; distance = candidate.DistanceSquared; }
+                // Still a bit naive when it comes to "Blocked", but now NPC takes Visible and/or Remembered into account.
+                if (IsEligable(candidate) && candidate.DistanceSquared < distance)
+                {
+                    nearest = candidate.Id;
+                    distance = candidate.DistanceSquared;
+                }
             }
             return new AgentFacts(false, nearest, false);
         }
