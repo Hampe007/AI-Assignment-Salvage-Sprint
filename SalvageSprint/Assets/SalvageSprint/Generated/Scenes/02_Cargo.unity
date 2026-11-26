@@ -1664,7 +1664,7 @@ MonoBehaviour:
   - {fileID: 1601765039}
   - {fileID: 1382882243}
   decisionInterval: 0.15
-  logDecisionChanges: 0
+  logDecisionChanges: 1
 --- !u!114 &810191415
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1679,6 +1679,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: SalvageSprint.Runtime::SalvageSprint.PickupSensor
   match: {fileID: 1480075356}
   radius: 10
+  ShowPerceptionRange: 1
+  showSightChecks: 1
+  sighCheckDisplaySeconds: 0.4
 --- !u!114 &810191416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1691,6 +1694,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57722a64d01dced64664b00e2e94b0bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SalvageSprint.Runtime::SalvageSprint.Navigator
+  failedRequestRetryDelay: 1
+  logNavigationFailures: 1
+  lastFailure: None
 --- !u!195 &810191417
 NavMeshAgent:
   m_ObjectHideFlags: 0
