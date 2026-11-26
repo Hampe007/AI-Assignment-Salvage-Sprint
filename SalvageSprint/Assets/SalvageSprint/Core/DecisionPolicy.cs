@@ -22,6 +22,15 @@ namespace SalvageSprint.Core
             if (observation.Carrying)
                 return new AgentFacts(true, -1, false);
 
+            foreach (Candidate candidate in observation.Candidates)
+            {
+                if (candidate.Id == observation.CurrentTargetId && IsEligable(candidate))
+                {
+                    // We have no cargo, this target selected, we shall keep existing target
+                    return new AgentFacts(false, candidate.Id, true);
+                }
+            }
+            
             int nearest = -1;
             float distance = float.PositiveInfinity;
             foreach (Candidate candidate in observation.Candidates)
@@ -43,9 +52,17 @@ namespace SalvageSprint.Core
             // Deliberately naive: ignores RetainedTarget and any other facts.
             if (facts.NeedsDelivery)
                 return new Decision(TaskKind.Deliver, -1, "Cargo held: return to depot");
-            return facts.HasUsableTarget
-                ? new Decision(TaskKind.Collect, facts.SelectedTargetId, "Nearest candidate; reselected each tick")
-                : new Decision(TaskKind.Explore, -1, "No candidate: visit the next survey point");
+
+            if (!facts.HasUsableTarget)
+            {
+                return new Decision(TaskKind.Explore, -1, "No known eligible target to pick-up, NPC will visit next survey point");    
+            }
+            
+            string reason = facts.RetainedTarget
+                ? "Retained the current eligible target"
+                : "Nearest eligible known pickup";
+
+            return new Decision(TaskKind.Collect, facts.SelectedTargetId, reason);
         }
     }
 }

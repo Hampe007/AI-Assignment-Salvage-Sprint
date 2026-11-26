@@ -9,7 +9,7 @@ Exact Unity version: 6000.3.26f1
 
 Checkpoint commit / repository: main
 
-Current stage and anything unfinished: Stage 2 done, Stage 3 is next. 
+Current stage and anything unfinished: Stage 3 done, Stage 4 is next.
 
 ## Initial prediction
 
@@ -42,7 +42,7 @@ Use one actual situation. Include the observation data, derived facts, selected 
 - Gameplay feedback:
   - When `MatchController` confirms collection, the rival gains cargo. On the next decision, `Infer` should derive `NeedsDelivery = true`, and `Choose` should select Deliver with Target: -1. The rival should then navigate to the depot. Which it does.
 
-### Stage 2 follow-up: F4 hidden pickup
+### Stage 2 follow-up: Hidden pickup (F4)
 
 - Changed rule: In `DecisionPolicy.Infer`, a candidate must be available and either visible or remembered before its distance is compared. Hidden unknown pickups are rejected.
 - Observed result: In hidden pickup scenario (F4), the rival ignored a hidden pickup, then selected it once it became visible and was closer. This matches the new rule because becoming visible made the pickup eligible for distance comparison.
@@ -54,11 +54,14 @@ Use one actual situation. Include the observation data, derived facts, selected 
 | Normal loop and restart | | |
 | Carrying cargo | | |
 | Hidden / remembered pickup | Hidden unknown pickups should be ignored until visible. | In Scenario "hidden pickup" (F4), the rival ignored a hidden pickup, then selected it once it became visible and was closer. Remembered pickups outside sight were covered by the supplied Stage 2 test. |
-| Target taken | | |
+| Target taken | Release the target when it is taken, then select another eligible pickup or Explore if none qualifies. | In "Target taken" (F5) scenario, the targeted pickup for the rival was instead picked up for the player so it got removed. The rival released that target and continued as expected. |
 | Unreachable target | | |
 | No usable pickup | | |
 
 Supplied test result, with any added tests identified: After the Stage 2 edit, 13 passed and 4 failed, matching the expected Stage 2 total.
+
+After the Stage 3 edit, tests showed 7 passed and 3 failed. Both Stage 3 tests, and all three Stage 2 tests and both regression tests still passed.
+
 Live walkthrough checked by / recording link if used:
 
 ## One correction and one independent check
@@ -81,6 +84,18 @@ My counterexample or experiment: prediction, observed result, and one limitation
 - A hidden unknown pickup cannot qualify because the rival has not seen or remembered it. Being nearby does not mean the rival knows it exists.
 - The pickup must still be available, even if remembered. Distance only decides between candidates that pass the availability and knowledge checks.
 - Memory holds one selected target, not every pickup ever seen. Stage 2 allows switching to a closer eligible pickup keeping a useful current target comes in Stage 3.
+
+## Stage 3
+
+- `DecisionPolicy.Infer` keeps the current target while it is eligible, even if another pickup is closer. It sets `RetainedTarget` to true. If the current target is missing or unavailable, the nearest eligible alternative is selected with `RetainedTarget` false.
+- `DecisionPolicy.Choose` now gives different Collect reasons for retaining the current target and selecting a new one.
+- In `RivalBrain.Update`, the supplied availability check clears the remembered target when its pickup has been taken. The scenario F5, observation above confirmed that the rival releases the target and continues.
+
+State transitions:
+- Explore -> Collect when an eligible pickup is selected.
+- Collect -> Deliver after successful collection gives the rival cargo.
+- Deliver -> Collect or Explore after delivery, depending on current available knowledge the rival has.
+- Collect -> another Collect target or Explore when the current target becomes unusable.
 
 ## Collaboration and help
 
