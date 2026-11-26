@@ -31,6 +31,17 @@ One question about NPC behaviour:
 
 Use one actual situation. Include the observation data, derived facts, selected task and reason, movement request/result, and how feedback affects a later decision. Identify the responsible code locations. A tiny state diagram can accompany this trace.
 
+- Observation:
+  - During play, we saw Task: Collect, Target: 10, Travel: Moving and Cargo: False.
+- Derived facts:
+  - From reading `DecisionPolicy.Infer`, this corresponds to `NeedsDelivery = false`, `SelectedTargetId = 10` and `HasUsableTarget = true`.
+- Decision:
+  - `DecisionPolicy.Choose` selects Collect with pickup target 10.
+- Movement:
+  - `RivalBrain.Update` calls `navigator.Request` with the selected pickup’s position. We observed the rival moving toward it.
+- Gameplay feedback:
+  - When `MatchController` confirms collection, the rival gains cargo. On the next decision, `Infer` should derive `NeedsDelivery = true`, and `Choose` should select Deliver with Target: -1. The rival should then navigate to the depot. Which it does.
+
 ## Scenario record
 
 | Scenario | Predicted result | Observed result and short evidence / remaining issue |
