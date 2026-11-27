@@ -9,7 +9,7 @@ Exact Unity version: 6000.3.26f1
 
 Checkpoint commit / repository: main
 
-Current stage and anything unfinished: Stage 4 done, Stage 5 is next.
+Current stage and anything unfinished: Stage 5 done. (Part 1 checkpoint)
 
 ## Initial prediction
 
@@ -51,16 +51,16 @@ Use one actual situation. Include the observation data, derived facts, selected 
 
 | Scenario | Predicted result | Observed result and short evidence / remaining issue |
 |---|---|---|
-| Normal loop and restart | | |
-| Carrying cargo | | |
+| Normal loop and restart | Collect, deliver, continue, finish and restart. | In F2, the normal race and restart worked as expected. |
+| Carrying cargo | Deliver held cargo before pursuing more scrap. | In F3, the rival delivered its cargo first as expected. |
 | Hidden / remembered pickup | Hidden unknown pickups should be ignored until visible. | In Scenario "hidden pickup" (F4), the rival ignored a hidden pickup, then selected it once it became visible and was closer. Remembered pickups outside sight were covered by the supplied Stage 2 test. |
 | Target taken | Release the target when it is taken, then select another eligible pickup or Explore if none qualifies. | In "Target taken" (F5) scenario, the targeted pickup for the rival was instead picked up for the player so it got removed. The rival released that target and continued as expected. |
 | Unreachable target | Release the blocked target after a failed route, then select another eligible pickup or Explore if none qualifies. | In "Unreachable" (F6), the rival first stood still after the route failed. After the Stage 4 change, it went down and collected the reachable pickup, deposited it and then started exploring. |
-| No usable pickup | | |
+| No usable pickup | Explore without crashing or selecting nonexistent pickups. | In F7, the rival explored without pickups as expected. |
 
 Supplied test result, with any added tests identified: After the Stage 2 edit, 13 passed and 4 failed, matching the expected Stage 2 total.
 
-After the Stage 3 edit, tests showed 7 passed and 3 failed. Both Stage 3 tests, and all three Stage 2 tests and both regression tests still passed.
+After the Stage 3 edit, policy tests showed 7 passed and 3 failed. Both Stage 3 tests, and all three Stage 2 tests and both regression tests still passed.
 
 After the Stage 4 edit, all 17 supplied EditMode tests passed with 0 failed.
 
@@ -68,19 +68,21 @@ Live walkthrough checked by / recording link if used:
 
 ## One correction and one independent check
 
-(Will probably switch what I wrote to something else when I have something better to show)
-
 The original weakness and why it happened:
 
-- The original condition checked only availability and distance, so a nearer hidden unknown pickup could win even though the rival did not know about it.
+- The original policy only checked availability and distance, so it could choose a hidden pickup it had never seen. Being nearby did not mean the rival knew it was there.
 
 What I changed and why it addresses the cause:
 
-- In `DecisionPolicy.Infer`, I added `(candidate.Visible || candidate.Remembered)` to the availability and distance checks. A pickup must now be available and either visible or remembered before distance ranks it. This rejects hidden unknown pickups while allowing remembered pickups outside sight.
+- I added `(candidate.Visible || candidate.Remembered)` to the eligibility rule. A pickup must be visible within sensing range with clear line of sight, or be the remembered target. In F4, hidden unknown pickups were ignored until visible. The supplied tests also confirmed that a remembered target can remain known outside sight.
 
 My counterexample or experiment: prediction, observed result, and one limitation:
 
-## Stage 2 - small extra notes
+- Prediction: Reducing PickupSensor Radius from 10 to 3 should make the rival explore closer to pickups before detecting them.
+- Observed result: With radius 3, the rival used survey points more often instead of directly finding pickups in range. After restoring 10, it detected pickups farther away again.
+- Limitation: I only checked the normal race. A selected target can still be remembered outside the sensing radius.
+
+## Stage 2
 
 - A hidden remembered pickup can qualify because the rival previously selected it while it was visible and still remembers that target. Losing sight does not immediately erase that knowledge.
 - A hidden unknown pickup cannot qualify because the rival has not seen or remembered it. Being nearby does not mean the rival knows it exists.
@@ -99,7 +101,7 @@ State transitions:
 - Deliver -> Collect or Explore after delivery, depending on current available knowledge the rival has.
 - Collect -> another Collect target or Explore when the current target becomes unusable.
 
-## Stage 4 - small extra notes
+## Stage 4
 
 - Added `!candidate.Blocked` to `IsEligable` so blocked pickups cannot be selected or retained. If none qualify, the rival explores.
 - In F6, the rival switched to the reachable pickup, deposited it and then explored. F4 and F5 still worked as expected.

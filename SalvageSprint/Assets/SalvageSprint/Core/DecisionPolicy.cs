@@ -7,12 +7,10 @@ namespace SalvageSprint.Core
     public static class DecisionPolicy
     {
         public const string Label = "Part 1 starter: nearest candidate";
-
-
+        
         private static bool IsEligable(Candidate candidate)
         {
-            // Avaiable means the pickup has not been taken.
-            // Known means that its not blocked and is either visible or retained in memory.
+            // Eligable means that the pickup has not been taken (that its available) and that its not blocked and is either visible or retained in memory.
             return candidate.Available && !candidate.Blocked && (candidate.Visible || candidate.Remembered);
         }
         
@@ -59,8 +57,8 @@ namespace SalvageSprint.Core
             }
             
             string reason = facts.RetainedTarget
-                ? "Retained the current eligible target"
-                : "Nearest eligible known pickup";
+                ? "Retained the rivals current eligible target"
+                : "Rivals nearest eligible known pickup";
 
             return new Decision(TaskKind.Collect, facts.SelectedTargetId, reason);
         }
