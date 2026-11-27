@@ -9,7 +9,7 @@ Exact Unity version: 6000.3.26f1
 
 Checkpoint commit / repository: main
 
-Current stage and anything unfinished: Stage 3 done, Stage 4 is next.
+Current stage and anything unfinished: Stage 4 done, Stage 5 is next.
 
 ## Initial prediction
 
@@ -55,12 +55,14 @@ Use one actual situation. Include the observation data, derived facts, selected 
 | Carrying cargo | | |
 | Hidden / remembered pickup | Hidden unknown pickups should be ignored until visible. | In Scenario "hidden pickup" (F4), the rival ignored a hidden pickup, then selected it once it became visible and was closer. Remembered pickups outside sight were covered by the supplied Stage 2 test. |
 | Target taken | Release the target when it is taken, then select another eligible pickup or Explore if none qualifies. | In "Target taken" (F5) scenario, the targeted pickup for the rival was instead picked up for the player so it got removed. The rival released that target and continued as expected. |
-| Unreachable target | | |
+| Unreachable target | Release the blocked target after a failed route, then select another eligible pickup or Explore if none qualifies. | In "Unreachable" (F6), the rival first stood still after the route failed. After the Stage 4 change, it went down and collected the reachable pickup, deposited it and then started exploring. |
 | No usable pickup | | |
 
 Supplied test result, with any added tests identified: After the Stage 2 edit, 13 passed and 4 failed, matching the expected Stage 2 total.
 
 After the Stage 3 edit, tests showed 7 passed and 3 failed. Both Stage 3 tests, and all three Stage 2 tests and both regression tests still passed.
+
+After the Stage 4 edit, all 17 supplied EditMode tests passed with 0 failed.
 
 Live walkthrough checked by / recording link if used:
 
@@ -96,6 +98,13 @@ State transitions:
 - Collect -> Deliver after successful collection gives the rival cargo.
 - Deliver -> Collect or Explore after delivery, depending on current available knowledge the rival has.
 - Collect -> another Collect target or Explore when the current target becomes unusable.
+
+## Stage 4 - small extra notes
+
+- Added `!candidate.Blocked` to `IsEligable` so blocked pickups cannot be selected or retained. If none qualify, the rival explores.
+- In F6, the rival switched to the reachable pickup, deposited it and then explored. F4 and F5 still worked as expected.
+- All 17 supplied tests passed now, with the previously failing Stage 4 tests now being a success.
+- Failed pickup are blocked for six seconds. They can be retried later, but the route may still be unreachable.
 
 ## Collaboration and help
 

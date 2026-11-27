@@ -12,8 +12,8 @@ namespace SalvageSprint.Core
         private static bool IsEligable(Candidate candidate)
         {
             // Avaiable means the pickup has not been taken.
-            // Known means currently visible or retained in memory.
-            return candidate.Available && (candidate.Visible || candidate.Remembered);
+            // Known means that its not blocked and is either visible or retained in memory.
+            return candidate.Available && !candidate.Blocked && (candidate.Visible || candidate.Remembered);
         }
         
         // Infer the agent's facts from its observation. This is a simple, naive implementation that ignores visibility and memory.
@@ -35,7 +35,7 @@ namespace SalvageSprint.Core
             float distance = float.PositiveInfinity;
             foreach (Candidate candidate in observation.Candidates)
             {
-                // Still a bit naive when it comes to "Blocked", but now NPC takes Visible and/or Remembered into account.
+                // Now NPC takes Visible and/or Remembered into account along with if its not blocked.
                 if (IsEligable(candidate) && candidate.DistanceSquared < distance)
                 {
                     nearest = candidate.Id;
